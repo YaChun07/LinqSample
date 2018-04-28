@@ -106,6 +106,23 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
+
+        [TestMethod]
+        public void To91Port_IfContainstw()
+        {
+            var urls = RepositoryFactory.GetUrls();
+            var actual = WithoutLinq.ChangeTo91Port(urls);
+
+            var expected = new List<string>
+            {
+                "http://tw.yahoo.com:91",
+                "https://facebook.com",
+                "https://twitter.com:91",
+                "http://github.com"
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
     }
 }
 
@@ -130,6 +147,22 @@ internal static class WithoutLinq
         foreach (var urlItem in urls)
         {
             yield return selector(urlItem);
+        }
+    }
+
+    public static IEnumerable<string> ChangeTo91Port(IEnumerable<string> urls)
+    {
+        foreach (var urlItem in urls)
+        {
+            if (urlItem.Contains("tw"))
+            {
+                yield return urlItem + ":91";
+            }
+            else
+            {
+                yield return urlItem;
+
+            }
         }
     }
 }
