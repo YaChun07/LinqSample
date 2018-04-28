@@ -3,6 +3,7 @@ using ExpectedObjects;
 using LinqTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -123,6 +124,41 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
+
+        [TestMethod]
+        public void FindEngineerSalary()
+        {
+            var employee  = RepositoryFactory.GetEmployees();
+            var actual = employee.MyWhere(e => e.Role == RoleType.Engineer)
+                .MySelect(s => s.MonthSalary);
+
+            var expected = new List<int>
+            {
+               100,
+               140 ,
+               280 ,
+               120 ,
+               250
+            };
+           
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void SelectTopN()
+        {
+            var products  = RepositoryFactory.GetProducts();
+            var actual = products.MyTake(3);
+
+            var expected = new List<Product>
+            {
+                new Product{Id=1, Cost=11, Price=110, Supplier="Odd-e" },
+                new Product{Id=2, Cost=21, Price=210, Supplier="Yahoo" },
+                new Product{Id=3, Cost=31, Price=310, Supplier="Odd-e" },
+            };
+           
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
     }
 }
 
@@ -163,6 +199,19 @@ internal static class WithoutLinq
                 yield return urlItem;
 
             }
+        }
+    }
+
+    public static IEnumerable<Product> MyTake(this IEnumerable<Product> products, int topN)
+    {
+        int count = 0;
+        foreach (var product in products)
+        {
+            if (count < topN)
+            {
+                yield return product;
+            }
+            count++;
         }
     }
 }
