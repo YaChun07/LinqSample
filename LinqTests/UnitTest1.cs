@@ -72,6 +72,40 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual);
         }
+
+        [TestMethod]
+        public void ToHttps()
+        {
+            var urls = RepositoryFactory.GetUrls();
+            var actual = WithoutLinq.GetHttps(urls);
+
+            var expected = new List<string>
+            {
+                "https://tw.yahoo.com:8080",
+                "https://facebook.com:8080",
+                "https://twitter.com:8080",
+                "https://github.com:8080"
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void UrlLength()
+        {
+            var urls = RepositoryFactory.GetUrls();
+            var actual = WithoutLinq.GetUrlLength(urls);
+
+            var expected = new List<int>
+            {
+                19,
+                20,
+                19,
+                17 
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
     }
 }
 
@@ -90,6 +124,22 @@ internal class WithoutLinq
 
         return productList;
     }
+
+    public static IEnumerable<string> GetHttps(IEnumerable<string> urls)
+    {
+        foreach (var urlItem in urls)
+        {
+            yield return urlItem.Replace("http:", "https:").Replace(".com", ".com:8080");
+        }
+    }
+
+    public static IEnumerable<int> GetUrlLength(IEnumerable<string> urls)
+    {
+        foreach (var urlItem in urls)
+        {
+            yield return urlItem.Length;
+        }
+    }
 }
 
 namespace Amanda
@@ -98,16 +148,6 @@ namespace Amanda
     {
         public static IEnumerable<TSource> MyWhere<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> func)
         {
-            //var result =new List<Product>();
-            //foreach (var product in products)
-            //{
-            //    if (func(product))
-            //    {
-            //        result.Add(product);
-            //    }
-            //}
-            //return result;
-
             var result = source.GetEnumerator();
             while (result.MoveNext())
             {
