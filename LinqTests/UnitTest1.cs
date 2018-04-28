@@ -313,5 +313,19 @@ namespace LinqTests
 
         }
 
+        [TestMethod]
+        public void Distinct()
+        {
+            var employees = RepositoryFactory.GetEmployees();
+            var actual = employees.MySelect(p=>p.Role).MyDistinct();
+            var expected = new List<RoleType>
+            {
+                RoleType.Engineer,
+                RoleType.OP,
+                RoleType.Manager
+            };
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+
+        }
     }
 }

@@ -154,6 +154,19 @@ internal static class YourOwnLinq
         return sum;
     }
 
+    public static IEnumerable<TSource> MyDistinct<TSource>(this IEnumerable<TSource> sources)
+    {
+        var enumerator = sources.GetEnumerator();
+        var disList = new List<TSource>();
+        while (enumerator.MoveNext())
+        {
+            if (!disList.Contains(enumerator.Current))
+            {
+                disList.Add(enumerator.Current);
+                yield return enumerator.Current;
+            }
+        }
+    }
     public static IEnumerable<int> GroupSum<TSource>(this IEnumerable<TSource> sources,int groupSize, Func<TSource, int> func)
     {
         var enumerator = sources.GetEnumerator();
