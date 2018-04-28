@@ -202,6 +202,26 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
+        
+        [TestMethod]
+        public void SkipMoreThan300()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MyRealSkipWhile(e => e.Price < 300);
+
+            var expected = new List<Product>
+            {
+                new Product{Id=3, Cost=31, Price=310, Supplier="Odd-e" },
+                new Product{Id=4, Cost=41, Price=410, Supplier="Odd-e" },
+                new Product{Id=5, Cost=51, Price=510, Supplier="Momo" },
+                new Product{Id=6, Cost=61, Price=610, Supplier="Momo" },
+                new Product{Id=7, Cost=71, Price=710, Supplier="Yahoo" },
+                new Product{Id=8, Cost=18, Price=780, Supplier="Yahoo" },
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
 
         [TestMethod]
         public void Take2MoreThan300()
@@ -232,6 +252,65 @@ namespace LinqTests
             };
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void Sum()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MySum(p => p.Price);
+
+            var expected = 3650;
+
+            expected.ToExpectedObject().ShouldEqual(actual);
+        }
+        [Ignore]
+        [TestMethod]
+        public void Group_3_AndSum()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.GroupSum(3,p => p.Price);
+
+            var expected = new List<int>
+            {
+                630,1530,1490
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+        [Ignore]
+        [TestMethod]
+        public void Group_5_AndSum()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.GroupSum(5, p => p.Price);
+
+            var expected = new List<int>
+            {
+                1550,2100
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+        
+        [TestMethod]
+        public void AnyHasRecord()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MyAny();
+
+            Assert.IsTrue(actual);
+
+        }
+
+        [TestMethod]
+        public void All()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MyAll(p=>p.Price>200);
+
+            Assert.IsFalse(actual);
+
         }
 
     }
