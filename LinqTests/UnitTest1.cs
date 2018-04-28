@@ -3,7 +3,6 @@ using ExpectedObjects;
 using LinqTests;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -102,7 +101,7 @@ namespace LinqTests
                 19,
                 20,
                 19,
-                17 
+                17
             };
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
@@ -128,7 +127,7 @@ namespace LinqTests
         [TestMethod]
         public void FindEngineerSalary()
         {
-            var employee  = RepositoryFactory.GetEmployees();
+            var employee = RepositoryFactory.GetEmployees();
             var actual = employee.MyWhere(e => e.Role == RoleType.Engineer)
                 .MySelect(s => s.MonthSalary);
 
@@ -140,14 +139,14 @@ namespace LinqTests
                120 ,
                250
             };
-           
+
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
         [TestMethod]
         public void SelectTopN()
         {
-            var products  = RepositoryFactory.GetProducts();
+            var products = RepositoryFactory.GetProducts();
             var actual = products.MyTake(3);
 
             var expected = new List<Product>
@@ -156,7 +155,21 @@ namespace LinqTests
                 new Product{Id=2, Cost=21, Price=210, Supplier="Yahoo" },
                 new Product{Id=3, Cost=31, Price=310, Supplier="Odd-e" },
             };
-           
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void SelectTopN_with_index()
+        {
+            var employees = RepositoryFactory.GetEmployees();
+            var actual = employees.MyTake(3).MySelect((e, index) => (index + 1) + "-" + e.Name);
+
+            var expected = new List<string>
+            {
+                "1-Joe","2-Tom","3-Kevin"
+            };
+
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
     }
@@ -178,11 +191,21 @@ internal static class WithoutLinq
         return productList;
     }
 
-    public static IEnumerable<TResult> MySelect<TSource,TResult>(this IEnumerable<TSource> urls, Func<TSource, TResult> selector)
+    public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, TResult> selector)
     {
         foreach (var urlItem in urls)
         {
             yield return selector(urlItem);
+        }
+    }
+
+    public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, int, TResult> selector)
+    {
+        var count = 0;
+        foreach (var urlItem in urls)
+        {
+            yield return selector(urlItem, count);
+            count++;
         }
     }
 
@@ -197,15 +220,14 @@ internal static class WithoutLinq
             else
             {
                 yield return urlItem;
-
             }
         }
     }
 
-    public static IEnumerable<Product> MyTake(this IEnumerable<Product> products, int topN)
+    public static IEnumerable<TSource> MyTake<TSource>(this IEnumerable<TSource> sources, int topN)
     {
         int count = 0;
-        foreach (var product in products)
+        foreach (var product in sources)
         {
             if (count < topN)
             {
@@ -213,6 +235,11 @@ internal static class WithoutLinq
             }
             count++;
         }
+        //var enumerator = sources.GetEnumerator();
+        //while (enumerator.MoveNext())
+        //{
+        //    var
+        //}
     }
 }
 
