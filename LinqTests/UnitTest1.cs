@@ -77,7 +77,7 @@ namespace LinqTests
         public void ToHttps()
         {
             var urls = RepositoryFactory.GetUrls();
-            var actual = WithoutLinq.GetHttps(urls);
+            var actual = urls.MySelect(urlItem => urlItem.Replace("http:", "https:").Replace(".com", ".com:8080"));
 
             var expected = new List<string>
             {
@@ -94,7 +94,7 @@ namespace LinqTests
         public void UrlLength()
         {
             var urls = RepositoryFactory.GetUrls();
-            var actual = WithoutLinq.GetUrlLength(urls);
+            var actual = urls.MySelect(urlItem => urlItem.Length);
 
             var expected = new List<int>
             {
@@ -109,7 +109,7 @@ namespace LinqTests
     }
 }
 
-internal class WithoutLinq
+internal static class WithoutLinq
 {
     public static List<Product> FindProductByPrice(IEnumerable<Product> products, int lowBoundary, int highBoundary, string supplier)
     {
@@ -125,19 +125,11 @@ internal class WithoutLinq
         return productList;
     }
 
-    public static IEnumerable<string> GetHttps(IEnumerable<string> urls)
+    public static IEnumerable<TResult> MySelect<TSource,TResult>(this IEnumerable<TSource> urls, Func<TSource, TResult> selector)
     {
         foreach (var urlItem in urls)
         {
-            yield return urlItem.Replace("http:", "https:").Replace(".com", ".com:8080");
-        }
-    }
-
-    public static IEnumerable<int> GetUrlLength(IEnumerable<string> urls)
-    {
-        foreach (var urlItem in urls)
-        {
-            yield return urlItem.Length;
+            yield return selector(urlItem);
         }
     }
 }
