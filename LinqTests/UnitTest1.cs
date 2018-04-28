@@ -172,6 +172,55 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
+
+        [TestMethod]
+        public void Skip6()
+        {
+            var employees = RepositoryFactory.GetEmployees();
+            var actual = employees.MySkip(6);
+
+            var expected = new List<Employee>
+            {
+                new Employee{Name="Frank", Role=RoleType.Engineer, MonthSalary=120, Age=16, WorkingYear=2.6} ,
+                new Employee{Name="Joey", Role=RoleType.Engineer, MonthSalary=250, Age=40, WorkingYear=2.6},
+
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void Skip6MoreThan300()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MySkipWhile(e=>e.Price>300, 4);
+
+            var expected = new List<Product>
+            {
+                new Product{Id=1, Cost=11, Price=110, Supplier="Odd-e" },
+                new Product{Id=2, Cost=21, Price=210, Supplier="Yahoo" },
+                new Product{Id=7, Cost=71, Price=710, Supplier="Yahoo" },
+                new Product{Id=8, Cost=18, Price=780, Supplier="Yahoo" }
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
+        public void Take2MoreThan300()
+        {
+            var products = RepositoryFactory.GetProducts();
+            var actual = products.MyTakeWhile(e => e.Price > 300, 2);
+
+            var expected = new List<Product>
+            {
+                new Product{Id=3, Cost=31, Price=310, Supplier="Odd-e" },
+                new Product{Id=4, Cost=41, Price=410, Supplier="Odd-e" },
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
     }
 }
 
@@ -191,24 +240,6 @@ internal static class WithoutLinq
         return productList;
     }
 
-    public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, TResult> selector)
-    {
-        foreach (var urlItem in urls)
-        {
-            yield return selector(urlItem);
-        }
-    }
-
-    public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, int, TResult> selector)
-    {
-        var count = 0;
-        foreach (var urlItem in urls)
-        {
-            yield return selector(urlItem, count);
-            count++;
-        }
-    }
-
     public static IEnumerable<string> ChangeTo91Port(IEnumerable<string> urls)
     {
         foreach (var urlItem in urls)
@@ -222,24 +253,6 @@ internal static class WithoutLinq
                 yield return urlItem;
             }
         }
-    }
-
-    public static IEnumerable<TSource> MyTake<TSource>(this IEnumerable<TSource> sources, int topN)
-    {
-        int count = 0;
-        foreach (var product in sources)
-        {
-            if (count < topN)
-            {
-                yield return product;
-            }
-            count++;
-        }
-        //var enumerator = sources.GetEnumerator();
-        //while (enumerator.MoveNext())
-        //{
-        //    var
-        //}
     }
 }
 
@@ -256,6 +269,87 @@ namespace Amanda
                 if (func(itme))
                 {
                     yield return itme;
+                }
+            }
+        }
+
+        public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, TResult> selector)
+        {
+            foreach (var urlItem in urls)
+            {
+                yield return selector(urlItem);
+            }
+        }
+
+        public static IEnumerable<TSource> MySkip<TSource>(this IEnumerable<TSource> sources, int topN)
+        {
+            int count = 0;
+            foreach (var source in sources)
+            {
+                if (count >= topN)
+                {
+                    yield return source;
+                }
+                count++;
+            }
+        }
+
+        public static IEnumerable<TSource> MySkipWhile<TSource>(this IEnumerable<TSource> sources, Func<TSource, bool> selector,int skipNum)
+        {
+            var enumerator = sources.GetEnumerator();
+            var count = 0;
+            while (enumerator.MoveNext())
+            {
+                if (count < skipNum && selector(enumerator.Current))
+                {
+                    count++;
+                }
+                else
+                {
+                    yield return enumerator.Current;
+                }
+               
+            }
+        }
+
+        public static IEnumerable<TResult> MySelect<TSource, TResult>(this IEnumerable<TSource> urls, Func<TSource, int, TResult> selector)
+        {
+            var count = 0;
+            foreach (var urlItem in urls)
+            {
+                yield return selector(urlItem, count);
+                count++;
+            }
+        }
+
+        public static IEnumerable<TSource> MyTake<TSource>(this IEnumerable<TSource> sources, int topN)
+        {
+            var enumerator = sources.GetEnumerator();
+            var count = 0;
+            while (enumerator.MoveNext())
+            {
+                if (count < topN)
+                {
+                    yield return enumerator.Current;
+                }
+                else
+                {
+                    yield break;
+                }
+                count++;
+            }
+        }
+
+        public static IEnumerable<TSource> MyTakeWhile<TSource>(this IEnumerable<TSource> sources, Func<TSource, bool> selector, int takeNum)
+        {
+            var enumerator = sources.GetEnumerator();
+            var count = 0;
+            while (enumerator.MoveNext())
+            {
+                if (selector(enumerator.Current) && count < takeNum)
+                {
+                    yield return enumerator.Current;
+                    count++;
                 }
             }
         }
