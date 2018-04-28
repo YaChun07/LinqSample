@@ -95,4 +95,21 @@ internal static class YourOwnLinq
             }
         }
     }
+
+    public static IEnumerable<TSource> MyRealTakeWhile<TSource>(this IEnumerable<TSource> sources, Func<TSource, bool> selector)
+    {
+        var enumerator = sources.GetEnumerator();
+
+        while (enumerator.MoveNext())
+        {
+            if (selector(enumerator.Current))
+            {
+                yield return enumerator.Current;
+            }
+            else
+            {
+                yield break;
+            }
+        }
+    }
 }

@@ -218,5 +218,21 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        [TestMethod]
+        public void TakeWhileMoreThan300()
+        {
+            var employees = RepositoryFactory.GetEmployees();
+            var actual = employees.MyRealTakeWhile(e=>e.Age>30);
+
+            var expected = new List<Employee>
+            {
+                new Employee{Name="Joe", Role=RoleType.Engineer, MonthSalary=100, Age=44, WorkingYear=2.6 } ,
+                new Employee{Name="Tom", Role=RoleType.Engineer, MonthSalary=140, Age=33, WorkingYear=2.6} ,
+                new Employee{Name="Kevin", Role=RoleType.Manager, MonthSalary=380, Age=55, WorkingYear=2.6} 
+            };
+
+            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
     }
 }
