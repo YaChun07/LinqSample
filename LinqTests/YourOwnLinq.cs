@@ -157,12 +157,12 @@ internal static class YourOwnLinq
     public static IEnumerable<TSource> MyDistinct<TSource>(this IEnumerable<TSource> sources)
     {
         var enumerator = sources.GetEnumerator();
-        var disList = new List<TSource>();
+        var hashSet = new HashSet<TSource>();
         while (enumerator.MoveNext())
         {
-            if (!disList.Contains(enumerator.Current))
+            var canAdd = hashSet.Add(enumerator.Current);
+            if (canAdd)
             {
-                disList.Add(enumerator.Current);
                 yield return enumerator.Current;
             }
         }
