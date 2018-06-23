@@ -160,6 +160,15 @@ namespace LinqTests
         }
 
         [TestMethod]
+        public void IsMyFirst_true()
+        {
+            var enumerable = RepositoryFactory.GetEmployees();
+            var actual = enumerable.IsMyFirst(current => current.Age < 30);
+            var expect = new Employee { Name = "Andy", Role = RoleType.OP, MonthSalary = 80, Age = 22, WorkingYear = 2.6 };
+            expect.ToExpectedObject().ShouldEqual(actual);
+        }
+
+        [TestMethod]
         public void SelectTopN()
         {
             var products = RepositoryFactory.GetProducts();

@@ -37,6 +37,19 @@ internal static class YourOwnLinq
         return false;
     }
 
+    public static TSource IsMyFirst<TSource>(this IEnumerable<TSource> enumerable, Func<TSource, bool> predicate)
+    {
+        var enumerator = enumerable.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (predicate(enumerator.Current))
+            {
+                return enumerator.Current;
+            }
+        }
+        return default(TSource);
+    }
+
     public static bool MyAll<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)
     {
         var enumerator = source.GetEnumerator();
