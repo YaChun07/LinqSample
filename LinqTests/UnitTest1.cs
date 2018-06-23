@@ -387,9 +387,39 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
-        [Ignore]
         [TestMethod]
-        public void Two_Employee_Are_Equal()
+        public void Two_Employee_Count_AreNot_Equal()
+        {
+            var firstEmployees = new List<Employee>
+            {
+                new Employee{Name="Joe", Role=RoleType.Engineer, MonthSalary=100, Age=44,  WorkingYear=2.6} ,
+                new Employee{Name="Kevin", Role=RoleType.Manager, MonthSalary=380, Age=55, WorkingYear=2.6} ,
+                new Employee{Name="Joey", Role=RoleType.Engineer, MonthSalary=250, Age=40, WorkingYear=2.6}
+            };
+            var secondEmployee = RepositoryFactory.GetEmployees();
+            Assert.IsFalse(CompareTwoCollection(firstEmployees, secondEmployee, new EmployeeCompare()));
+        }
+
+        [TestMethod]
+        public void Two_Employee_With_SameCount_DiffContents()
+        {
+            var firstEmployees = new List<Employee>
+            {
+                new Employee{Name="Joy", Role=RoleType.Engineer, MonthSalary=100, Age=44, WorkingYear=2.6 } ,
+                new Employee{Name="Tom", Role=RoleType.Engineer, MonthSalary=140, Age=33, WorkingYear=2.6} ,
+                new Employee{Name="Kevin", Role=RoleType.Manager, MonthSalary=380, Age=55, WorkingYear=2.6} ,
+                new Employee{Name="Andy", Role=RoleType.OP, MonthSalary=80, Age=22, WorkingYear=2.6} ,
+                new Employee{Name="Bas", Role=RoleType.Engineer, MonthSalary=280, Age=36, WorkingYear=2.6} ,
+                new Employee{Name="Mary", Role=RoleType.OP, MonthSalary=180, Age=26, WorkingYear=2.6} ,
+                new Employee{Name="Frank", Role=RoleType.Engineer, MonthSalary=120, Age=16, WorkingYear=2.6} ,
+                new Employee{Name="Joey", Role=RoleType.Engineer, MonthSalary=250, Age=40, WorkingYear=2.6},
+            };
+            var secondEmployee = RepositoryFactory.GetEmployees();
+            Assert.IsFalse(CompareTwoCollection(firstEmployees, secondEmployee, new EmployeeCompare()));
+        }
+
+        [TestMethod]
+        public void Two_Employee_With_SameCount_SameContents()
         {
             var firstEmployees = new List<Employee>
             {
@@ -403,9 +433,10 @@ namespace LinqTests
                 new Employee{Name="Joey", Role=RoleType.Engineer, MonthSalary=250, Age=40, WorkingYear=2.6},
             };
             var secondEmployee = RepositoryFactory.GetEmployees();
-            firstEmployees.ToExpectedObject().ShouldEqual(secondEmployee);
+            Assert.IsTrue(CompareTwoCollection(firstEmployees, secondEmployee, new EmployeeCompare()));
         }
 
+        [Ignore]
         [TestMethod]
         public void UrlLength()
         {
@@ -420,7 +451,37 @@ namespace LinqTests
                 17
             };
 
-            expected.ToExpectedObject().ShouldEqual(actual.ToList());
+            expected.ToExpectedObject().ShouldEqual(actual);
+        }
+
+        private static bool IsCollectionsSameCounts(bool firstMoveNext, bool secondMoveNext)
+        {
+            return firstMoveNext == secondMoveNext;
+        }
+
+        private bool CompareTwoCollection(IEnumerable<Employee> firstEmployees, IEnumerable<Employee> secondEmployee, EmployeeCompare equalityComparer)
+        {
+            var firstEnumerator = firstEmployees.GetEnumerator();
+            var secondEnumerator = secondEmployee.GetEnumerator();
+            while (true)
+            {
+                var firstMoveNext = firstEnumerator.MoveNext();
+                var secondMoveNext = secondEnumerator.MoveNext();
+
+                if (!IsCollectionsSameCounts(firstMoveNext, secondMoveNext))
+                {
+                    return false;
+                }
+
+                if (!firstMoveNext)
+                {
+                    return true;
+                }
+                if (!equalityComparer.Equals(firstEnumerator.Current, secondEnumerator.Current))
+                {
+                    return false;
+                }
+            }
         }
 
         //private Employee MyFirstOrDefault(IEnumerable<Employee> enumerable)
@@ -461,6 +522,19 @@ namespace LinqTests
         public int GetHashCode(ColorBall obj)
         {
             return obj.Color.GetHashCode() & obj.Prize.GetHashCode();
+        }
+    }
+
+    internal class EmployeeCompare : IEqualityComparer<Employee>
+    {
+        public bool Equals(Employee x, Employee y)
+        {
+            return (x.Name == y.Name && x.Age == y.Age);
+        }
+
+        public int GetHashCode(Employee obj)
+        {
+            return 0;
         }
     }
 }
