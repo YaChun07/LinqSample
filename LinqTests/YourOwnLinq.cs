@@ -129,6 +129,27 @@ internal static class YourOwnLinq
         }
     }
 
+    public static TSource MySingle<TSource>(this IEnumerable<TSource> colorBalls, Func<TSource, bool> predicate)
+    {
+        var enumerator = colorBalls.GetEnumerator();
+        var ball = default(TSource);
+        var isMatch = false;
+
+        while (enumerator.MoveNext())
+        {
+            if (predicate(enumerator.Current))
+            {
+                if (isMatch)
+                {
+                    throw new InvalidOperationException();
+                }
+                isMatch = true;
+                ball = enumerator.Current;
+            }
+        }
+        return isMatch ? ball : throw new InvalidOperationException();
+    }
+
     public static IEnumerable<TSource> MySkip<TSource>(this IEnumerable<TSource> sources, int topN)
     {
         int count = 0;

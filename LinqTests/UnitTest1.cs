@@ -1,5 +1,6 @@
 ﻿using ExpectedObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -121,6 +122,29 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        [TestMethod]
+        public void GetSingle()
+        {
+            var enumerable = RepositoryFactory.GetBalls();
+            var actual = enumerable.MySingle(current => current.Size == "M");
+            var colorBall = new ColorBall { Color = Color.Yellow, Size = "M", Prize = 500 };
+            colorBall.ToExpectedObject().ShouldEqual(actual);
+        }
+
+        [TestMethod]
+        public void GetSingle_butGet2()
+        {
+            var enumerable = RepositoryFactory.GetBalls();
+            Assert.ThrowsException<InvalidOperationException>(() => enumerable.MySingle(current => current.Size == "S"));
+        }
+
+        [TestMethod]
+        public void GetSingle_butGet3()
+        {
+            var enumerable = RepositoryFactory.GetBalls();
+            Assert.ThrowsException<InvalidOperationException>(() => enumerable.MySingle(current => current.Size == "L"));
+        }
+
         [Ignore]
         [TestMethod]
         public void Group_3_AndSum()
@@ -160,7 +184,7 @@ namespace LinqTests
         }
 
         [TestMethod]
-        public void IsMyFirst_true()
+        public void IsMyFirst_Normal()
         {
             var enumerable = RepositoryFactory.GetEmployees();
             var actual = enumerable.IsMyFirst(current => current.Age < 30);
@@ -184,6 +208,16 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        //private Employee MyFirstOrDefault(IEnumerable<Employee> enumerable)
+        //{
+        //    var enumerator = enumerable.GetEnumerator();
+        //    while (enumerator.MoveNext())
+        //    {
+        //        if (enumerator.Current.Age>60)
+        //        {
+        //        }
+        //    }
+        //}
         [TestMethod]
         public void SelectTopN_with_index()
         {
@@ -198,6 +232,13 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        //[TestMethod]
+        //public void IsMyFirst_or_Default()
+        //{
+        //    var enumerable = RepositoryFactory.GetEmployees();
+        //    var actual = MyFirstOrDefault(enumerable);
+        //    Assert.IsNull(actual);
+        //}
         [TestMethod]
         public void Skip6()
         {
