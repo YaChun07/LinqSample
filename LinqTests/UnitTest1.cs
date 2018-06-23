@@ -123,6 +123,21 @@ namespace LinqTests
         }
 
         [TestMethod]
+        public void GetLast()
+        {
+            var colorBalls = RepositoryFactory.GetBalls();
+            var expect = new ColorBall { Color = Color.Purple, Size = "S", Prize = 500 };
+            expect.ToExpectedObject().ShouldEqual(colorBalls.MyLast(current => current.Size == "S"));
+        }
+
+        [TestMethod]
+        public void GetLast_return_default()
+        {
+            var colorBalls = RepositoryFactory.GetBalls();
+            Assert.IsNull(colorBalls.MyLast(current => current.Size == "XL"));
+        }
+
+        [TestMethod]
         public void GetSingle()
         {
             var enumerable = RepositoryFactory.GetBalls();
@@ -192,6 +207,14 @@ namespace LinqTests
             expect.ToExpectedObject().ShouldEqual(actual);
         }
 
+        //[TestMethod]
+        //public void IsMyFirst_or_Default()
+        //{
+        //    var enumerable = RepositoryFactory.GetEmployees();
+        //    var actual = MyFirstOrDefault(enumerable);
+        //    Assert.IsNull(actual);
+        //}
+
         [TestMethod]
         public void SelectTopN()
         {
@@ -208,16 +231,6 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
-        //private Employee MyFirstOrDefault(IEnumerable<Employee> enumerable)
-        //{
-        //    var enumerator = enumerable.GetEnumerator();
-        //    while (enumerator.MoveNext())
-        //    {
-        //        if (enumerator.Current.Age>60)
-        //        {
-        //        }
-        //    }
-        //}
         [TestMethod]
         public void SelectTopN_with_index()
         {
@@ -232,13 +245,6 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
-        //[TestMethod]
-        //public void IsMyFirst_or_Default()
-        //{
-        //    var enumerable = RepositoryFactory.GetEmployees();
-        //    var actual = MyFirstOrDefault(enumerable);
-        //    Assert.IsNull(actual);
-        //}
         [TestMethod]
         public void Skip6()
         {
@@ -382,5 +388,18 @@ namespace LinqTests
 
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
+
+        //private Employee MyFirstOrDefault(IEnumerable<Employee> enumerable)
+        //{
+        //    var enumerator = enumerable.GetEnumerator();
+        //    while (enumerator.MoveNext())
+        //    {
+        //        if (enumerator.Current.Age > 60)
+        //        {
+        //            throw new InvalidOperationException();
+        //        }
+        //    }
+        //    return enumerator.Current;
+        //}
     }
 }

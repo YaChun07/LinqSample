@@ -82,6 +82,20 @@ internal static class YourOwnLinq
         }
     }
 
+    public static TSource MyLast<TSource>(this IEnumerable<TSource> colorBalls, Func<TSource, bool> predicate)
+    {
+        var enumerator = colorBalls.GetEnumerator();
+        var ball = default(TSource);
+        while (enumerator.MoveNext())
+        {
+            if (predicate(enumerator.Current))
+            {
+                ball = enumerator.Current;
+            }
+        }
+        return ball;
+    }
+
     public static IEnumerable<TSource> MyRealSkipWhile<TSource>(this IEnumerable<TSource> sources, Func<TSource, bool> selector)
     {
         var enumerator = sources.GetEnumerator();
