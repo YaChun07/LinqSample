@@ -224,6 +224,14 @@ namespace LinqTests
         }
 
         [TestMethod]
+        public void MyRange()
+        {
+            var expect = new List<int> { 1122, 1123, 1124 };
+            var actual = GetRange(1122, 3);
+            expect.ToExpectedObject().ShouldEqual(actual.ToList());
+        }
+
+        [TestMethod]
         public void SelectTopN()
         {
             var products = RepositoryFactory.GetProducts();
@@ -481,6 +489,14 @@ namespace LinqTests
                 {
                     return false;
                 }
+            }
+        }
+
+        private IEnumerable<int> GetRange(int start, int count)
+        {
+            for (int i = start; i < start + count; i++)
+            {
+                yield return i;
             }
         }
 
