@@ -28,6 +28,22 @@ namespace LinqTests
         }
 
         [TestMethod]
+        public void Contains_Special_Ball()
+        {
+            var colorBalls = RepositoryFactory.GetBalls();
+            var actual = colorBalls.ContainsBall(new ColorBall { Color = Color.Green, Size = "S", Prize = 500 }, new ColorBallEqualityComparer());
+            Assert.IsFalse(actual);
+        }
+
+        [TestMethod]
+        public void Contains_Special_Ball_return_true()
+        {
+            var colorBalls = RepositoryFactory.GetBalls();
+            var actual = colorBalls.ContainsBall(new ColorBall { Color = Color.Purple, Size = "S", Prize = 500 }, new ColorBallEqualityComparer());
+            Assert.IsTrue(actual);
+        }
+
+        [TestMethod]
         public void Distinct()
         {
             var employees = RepositoryFactory.GetEmployees();
@@ -207,14 +223,6 @@ namespace LinqTests
             expect.ToExpectedObject().ShouldEqual(actual);
         }
 
-        //[TestMethod]
-        //public void IsMyFirst_or_Default()
-        //{
-        //    var enumerable = RepositoryFactory.GetEmployees();
-        //    var actual = MyFirstOrDefault(enumerable);
-        //    Assert.IsNull(actual);
-        //}
-
         [TestMethod]
         public void SelectTopN()
         {
@@ -231,6 +239,13 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        //[TestMethod]
+        //public void IsMyFirst_or_Default()
+        //{
+        //    var enumerable = RepositoryFactory.GetEmployees();
+        //    var actual = MyFirstOrDefault(enumerable);
+        //    Assert.IsNull(actual);
+        //}
         [TestMethod]
         public void SelectTopN_with_index()
         {
@@ -372,6 +387,25 @@ namespace LinqTests
             expected.ToExpectedObject().ShouldEqual(actual.ToList());
         }
 
+        [Ignore]
+        [TestMethod]
+        public void Two_Employee_Are_Equal()
+        {
+            var firstEmployees = new List<Employee>
+            {
+                new Employee{Name="Joe", Role=RoleType.Engineer, MonthSalary=100, Age=44, WorkingYear=2.6 } ,
+                new Employee{Name="Tom", Role=RoleType.Engineer, MonthSalary=140, Age=33, WorkingYear=2.6} ,
+                new Employee{Name="Kevin", Role=RoleType.Manager, MonthSalary=380, Age=55, WorkingYear=2.6} ,
+                new Employee{Name="Andy", Role=RoleType.OP, MonthSalary=80, Age=22, WorkingYear=2.6} ,
+                new Employee{Name="Bas", Role=RoleType.Engineer, MonthSalary=280, Age=36, WorkingYear=2.6} ,
+                new Employee{Name="Mary", Role=RoleType.OP, MonthSalary=180, Age=26, WorkingYear=2.6} ,
+                new Employee{Name="Frank", Role=RoleType.Engineer, MonthSalary=120, Age=16, WorkingYear=2.6} ,
+                new Employee{Name="Joey", Role=RoleType.Engineer, MonthSalary=250, Age=40, WorkingYear=2.6},
+            };
+            var secondEmployee = RepositoryFactory.GetEmployees();
+            firstEmployees.ToExpectedObject().ShouldEqual(secondEmployee);
+        }
+
         [TestMethod]
         public void UrlLength()
         {
@@ -401,5 +435,32 @@ namespace LinqTests
         //    }
         //    return enumerator.Current;
         //}
+    }
+
+    internal class ColorBallEqualityComparer : IEqualityComparer<ColorBall>
+    {
+        public bool Equals(ColorBall x, ColorBall y)
+        {
+            if (x == null && y == null)
+            {
+                return true;
+            }
+            else if (x == null || y == null)
+            {
+                return false;
+            }
+            else if (x.Color == y.Color
+               && x.Prize == y.Prize
+               && x.Size == y.Size)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public int GetHashCode(ColorBall obj)
+        {
+            return obj.Color.GetHashCode() & obj.Prize.GetHashCode();
+        }
     }
 }

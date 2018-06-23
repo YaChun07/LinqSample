@@ -3,6 +3,19 @@ using System.Collections.Generic;
 
 internal static class YourOwnLinq
 {
+    public static bool ContainsBall<TSource>(this IEnumerable<TSource> colorBalls, TSource colorBall, IEqualityComparer<TSource> equalityComparer)
+    {
+        var enumerator = colorBalls.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            if (equalityComparer.Equals(enumerator.Current, colorBall))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static IEnumerable<int> GroupSum<TSource>(this IEnumerable<TSource> sources, int groupSize, Func<TSource, int> func)
     {
         var enumerator = sources.GetEnumerator();
